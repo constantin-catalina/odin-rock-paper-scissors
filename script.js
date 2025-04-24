@@ -14,45 +14,65 @@ function getHumanChoice (){
     return choice;
 }
 
-function playGame() {
-    let humanScore = 0;
-    let computerScore = 0;
-
-    console.log("Welcome to Rock, Paper, Scissors! Let's play 5 rounds.");
-    for (let i = 0; i < 5; i++) {
-        const humanSelection = getHumanChoice();
-        const computerSelection = getComputerChoice();
-        const roundResult = playRound(humanSelection, computerSelection);
-        humanScore += roundResult.human;
-        computerScore += roundResult.computer;
-    }
-
-    console.log(`Final Score: You ${humanScore} - Computer ${computerScore}`);
-    if (humanScore > computerScore) {
-        console.log("Congratulations! You won the game!");
-    } else if (humanScore < computerScore) {
-        console.log("Sorry! You lose the game.");
-    } else {
-        console.log("It's a draw!");
-    }
-}
-
 function playRound(humanChoice, computerChoice) {
     if (humanChoice === computerChoice) {
-        console.log("It's a tie!");
+        roundResult.textContent = `It's a tie!`;
         return { human: 0, computer: 0 };
     } else if (
         (humanChoice === "rock" && computerChoice === "scissors") ||
         (humanChoice === "paper" && computerChoice === "rock") ||
         (humanChoice === "scissors" && computerChoice === "paper")
     ) {
-        console.log(`You win! ${humanChoice} beats ${computerChoice}.`);
+        roundResult.textContent = `You win! ${humanChoice} beats ${computerChoice}.`;
         return { human: 1, computer: 0 };
     } else {
-        console.log(`You lose! ${computerChoice} beats ${humanChoice}.`);
+        roundResult.textContent = `You lose! ${computerChoice} beats ${humanChoice}.`;
         return { human: 0, computer: 1 };
     }
 }
 
-// Start the game
-playGame();
+const score = { human: 0, computer: 0 };
+let playedRounds = 0;
+const maxRounds = 5;
+const buttons = document.querySelectorAll("button");
+
+const roundResult = document.createElement("div");
+roundResult.classList.add("round-result");
+
+const scoreText = document.createElement("div");
+scoreText.classList.add("score-text");
+
+const br = document.createElement("br");
+document.body.appendChild(br);
+
+document.body.appendChild(br);
+document.body.appendChild(roundResult);
+document.body.appendChild(scoreText);
+
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        const humanChoice = button.id;
+        const computerChoice = getComputerChoice();
+        const result = playRound(humanChoice, computerChoice);
+
+        score.human += result.human;
+        score.computer += result.computer;
+        playedRounds += 1;
+
+        if (playedRounds == maxRounds) {
+            if (score.human > score.computer) {
+                scoreText.textContent = `You win the game! Final Score: You ${score.human} - Computer ${score.computer}`;
+            } else if (score.human < score.computer) {
+                scoreText.textContent = `You lose the game! Final Score: You ${score.human} - Computer ${score.computer}`;
+            } else {
+                scoreText.textContent = `It's a tie! Final Score: You ${score.human} - Computer ${score.computer}`;
+            }
+            playedRounds = 0;
+            score.human = 0;
+            score.computer = 0;
+        }
+        else {
+            scoreText.textContent = `[Round ${playedRounds}] Score: You ${score.human} - Computer ${score.computer}`;
+        }
+    });
+});
